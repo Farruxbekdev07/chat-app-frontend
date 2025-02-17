@@ -1,7 +1,14 @@
-export default function Home() {
+"use client";
+
+import React from "react";
+import Link from "next/link";
+
+const App = () => {
   return (
     <div>
-      <h1>Home</h1>
+      <Link href={"/login"}>Login</Link>
     </div>
   );
-}
+};
+
+export default App;
