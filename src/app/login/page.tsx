@@ -21,7 +21,7 @@ const Login = () => {
 
   const onSubmit = (data: { phone: string }) => {
     router.push("/");
-    console.log("phone:", data.phone);
+    console.log("phone: ", data.phone);
   };
 
   return (
