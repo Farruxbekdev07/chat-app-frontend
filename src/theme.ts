@@ -64,6 +64,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiGrid: {
+      styleOverrides: {
+        container: {
+          background: "#232323",
+        },
+      },
+    },
   },
 });
 

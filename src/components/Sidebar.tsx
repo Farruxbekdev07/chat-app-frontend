@@ -11,6 +11,7 @@ import {
   ListItemButton,
   ListItemAvatar,
 } from "@mui/material";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 // constants
@@ -20,13 +21,19 @@ import { chats } from "src/constants/data";
 import { DrawerContainer } from "src/styles/Sidebar";
 
 const Sidebar = () => {
+  const router = useRouter();
+
+  const handleNavigate = () => {
+    router.push("/login");
+  };
+
   return (
     <DrawerContainer>
       <Drawer className="drawer" variant="permanent" anchor="left">
         <List>
           {chats.map(({ id, person, primary, secondary }) => (
             <ListItem disablePadding key={id}>
-              <ListItemButton>
+              <ListItemButton onClick={handleNavigate}>
                 <ListItemAvatar>
                   {person ? (
                     <Avatar alt="Profile Picture" src={person} />

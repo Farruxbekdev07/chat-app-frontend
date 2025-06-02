@@ -43,7 +43,7 @@ const chats = [
   },
   {
     id: 7,
-    primary: "Summer BBQ",
+    primary: "Login",
     secondary: `Who wants to have a cookout this weekend? I just got some furniture
         for my backyard and would love to fire up the grill.`,
     person: "/static/images/avatar/1.jpg",
