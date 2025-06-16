@@ -1,4 +1,4 @@
-import { firestore } from "./firebaseConfig";
+import { db } from "./config";
 import {
   collection,
   addDoc,
@@ -7,7 +7,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 
-const messagesRef = collection(firestore, "messages");
+const messagesRef = collection(db, "messages");
 
 export const sendMessage = async (text: string, uid: string) => {
   await addDoc(messagesRef, {

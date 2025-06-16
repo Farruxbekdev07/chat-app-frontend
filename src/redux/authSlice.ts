@@ -1,75 +1,77 @@
 // packages
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
-// local paths
-import {
-  User,
-  signOut,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
-import { auth } from "../firebase/firebaseConfig";
+// /src/redux/authSlice.ts
+import { auth } from "../firebase/config";
 
 interface AuthState {
-  user: User | null;
+  uid: string | null;
   loading: boolean;
+  error: string | null;
 }
 
 const initialState: AuthState = {
-  user: null,
+  uid: null,
   loading: false,
+  error: null,
 };
 
-// Async thunk: Login qilish
-export const loginUser = createAsyncThunk(
-  "auth/loginUser",
-  async ({ email, password }: { email: string; password: string }) => {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    return userCredential.user;
+export const loginWithPhone = createAsyncThunk(
+  "auth/loginWithPhone",
+  async (phone: string, { rejectWithValue }) => {
+    try {
+      const recaptcha = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+      });
+
+      const confirmation = await signInWithPhoneNumber(auth, phone, recaptcha);
+      window.confirmationResult = confirmation;
+      return null;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
   }
 );
 
-// Async thunk: Logout qilish
-export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
-  await signOut(auth);
-});
+export const verifyCode = createAsyncThunk(
+  "auth/verifyCode",
+  async (code: string, { rejectWithValue }) => {
+    try {
+      const result = await window.confirmationResult.confirm(code);
+      return result.user.uid;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      state.user = action.payload;
+    logout(state) {
+      state.uid = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser.pending, (state) => {
+      .addCase(loginWithPhone.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.user = action.payload;
+      .addCase(loginWithPhone.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(loginUser.rejected, (state) => {
+      .addCase(loginWithPhone.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload as string;
       })
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.user = null;
+      .addCase(verifyCode.fulfilled, (state, action) => {
+        state.uid = action.payload;
       });
   },
 });
 
-export const { setUser } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
-
-// Firebase foydalanuvchi holatini tekshirish
-export const listenToAuthChanges = (dispatch: any) => {
-  onAuthStateChanged(auth, (user) => {
-    dispatch(setUser(user || null));
-  });
-};

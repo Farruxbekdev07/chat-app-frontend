@@ -1,4 +1,4 @@
-import { realtimeDB } from "./firebaseConfig";
+import { realtimeDB } from "./config";
 import { ref, set, onValue } from "firebase/database";
 
 export const sendMessageRTDB = (text: string, uid: string) => {

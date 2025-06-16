@@ -1,18 +1,27 @@
-import { auth } from "./firebaseConfig";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+// firebase
+import { signInWithPhoneNumber, RecaptchaVerifier } from "firebase/auth";
+import { auth } from "./config";
 
-export const register = async (email: string, password: string) => {
-  await createUserWithEmailAndPassword(auth, email, password);
+let recaptchaVerifier: RecaptchaVerifier;
+
+export const setupRecaptcha = (containerId: string) => {
+  recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
+    size: "invisible",
+  });
 };
 
-export const login = async (email: string, password: string) => {
-  await signInWithEmailAndPassword(auth, email, password);
+export const sendVerificationCode = async (phone: string) => {
+  if (!recaptchaVerifier) throw new Error("Recaptcha not set up yet");
+  const confirmationResult = await signInWithPhoneNumber(
+    auth,
+    phone,
+    recaptchaVerifier
+  );
+  window.confirmationResult = confirmationResult; // bu yerda saqlaymiz
+  return confirmationResult;
 };
 
-export const logout = async () => {
-  await signOut(auth);
+export const confirmCode = async (code: string) => {
+  if (!window.confirmationResult) throw new Error("No confirmation result");
+  return await window.confirmationResult.confirm(code);
 };
