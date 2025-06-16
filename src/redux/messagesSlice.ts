@@ -1,23 +1,26 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { firestore } from "../firebase/firebaseConfig";
 import {
-  collection,
+  query,
   addDoc,
   getDocs,
   orderBy,
-  query,
+  collection,
+  onSnapshot,
 } from "firebase/firestore";
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+
+// firebase folder
+import { db } from "../firebase/config";
 
 interface Message {
   id: string;
-  text: string;
   uid: string;
+  text: string;
   createdAt: number;
 }
 
 interface MessagesState {
-  messages: Message[];
   loading: boolean;
+  messages: Message[];
 }
 
 const initialState: MessagesState = {
@@ -29,7 +32,7 @@ const initialState: MessagesState = {
 export const fetchMessages = createAsyncThunk(
   "messages/fetchMessages",
   async () => {
-    const messagesRef = collection(firestore, "messages");
+    const messagesRef = collection(db, "messages");
     const q = query(messagesRef, orderBy("createdAt", "asc"));
     const snapshot = await getDocs(q);
     return snapshot.docs.map((doc) => ({
@@ -39,11 +42,25 @@ export const fetchMessages = createAsyncThunk(
   }
 );
 
+export const listenToMessages = createAsyncThunk(
+  "messages/listenToMessages",
+  async (_, { dispatch }) => {
+    const q = query(collection(db, "messages"), orderBy("createdAt", "asc"));
+    onSnapshot(q, (snapshot) => {
+      const messages = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Message[];
+      dispatch(setMessages(messages));
+    });
+  }
+);
+
 // Async thunk: Yangi xabar yuborish
 export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
   async ({ text, uid }: { text: string; uid: string }) => {
-    const messagesRef = collection(firestore, "messages");
+    const messagesRef = collection(db, "messages");
     const docRef = await addDoc(messagesRef, {
       text,
       uid,
@@ -56,7 +73,11 @@ export const sendMessage = createAsyncThunk(
 const messagesSlice = createSlice({
   name: "messages",
   initialState,
-  reducers: {},
+  reducers: {
+    setMessages(state, action: PayloadAction<Message[]>) {
+      state.messages = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchMessages.pending, (state) => {
@@ -72,4 +93,5 @@ const messagesSlice = createSlice({
   },
 });
 
+export const { setMessages } = messagesSlice.actions;
 export default messagesSlice.reducer;
