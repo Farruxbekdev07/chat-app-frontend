@@ -28,7 +28,6 @@ const ChatWindow = () => {
 
   return (
     <ChatContainer>
-      <Header name={selectedUser?.fullName || ""} />
       <MessagesContainer>
         {messages?.length === 0 && (
           <div className="no-messages">No messages yet</div>
