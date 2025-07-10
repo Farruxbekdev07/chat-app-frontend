@@ -1,75 +1,67 @@
 "use client";
 
-// packages
-import {
-  Box,
-  Paper,
-  Popover,
-  InputBase,
-  IconButton,
-  Typography,
-} from "@mui/material";
-import { useState, useRef } from "react";
-import EmojiPicker from "emoji-picker-react";
-import { styled } from "@mui/material/styles";
+import React, { useState, useRef } from "react";
+import { Box, IconButton, InputBase, Typography, Popover } from "@mui/material";
 import { Send, AttachFile, EmojiEmotions, Close } from "@mui/icons-material";
+import EmojiPicker from "emoji-picker-react";
 import { ChatInputWrapper } from "src/styles/Chat";
 
-const ChatInput = ({
-  onSend,
-}: {
+interface Props {
   onSend: (message: string, file?: File | null) => void;
-}) => {
+}
+
+const ChatInput = ({ onSend }: Props) => {
   const [message, setMessage] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [emojiAnchor, setEmojiAnchor] = useState<null | HTMLElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = () => {
-    if (message.trim() || file) {
-      onSend(message, file);
-      setMessage("");
-      setFile(null);
-    }
+    const trimmed = message.trim();
+    if (!trimmed && !file) return;
+
+    onSend(trimmed, file);
+    setMessage("");
+    setFile(null);
   };
 
-  const handleEmojiClick = (emoji: any) => {
-    setMessage((prev) => prev + emoji.emoji);
+  const handleEmojiClick = (emojiData: any) => {
+    setMessage((prev) => prev + (emojiData.emoji || ""));
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setFile(event.target.files[0]);
-    }
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (selected) setFile(selected);
   };
 
   return (
-    <Box sx={{ position: "relative", padding: "10px" }}>
-      {/* 📎 Fayl yuklanganini ko‘rsatish */}
+    <Box sx={{ position: "relative", p: 1.5 }}>
+      {/* Show selected file preview */}
       {file && (
         <Box
           sx={{
+            position: "absolute",
+            bottom: 70,
+            left: 16,
+            bgcolor: "#f5f5f5",
+            px: 2,
+            py: 1,
+            borderRadius: 2,
             display: "flex",
             alignItems: "center",
-            gap: "10px",
-            padding: "5px",
-            borderRadius: "10px",
-            // background: "#f0f0f0",
-            position: "absolute",
-            bottom: "60px",
-            left: "10px",
+            gap: 1,
             boxShadow: 1,
           }}
         >
-          <Typography variant="body2">{file.name}</Typography>
+          <Typography fontSize={14}>{file.name}</Typography>
           <IconButton size="small" onClick={() => setFile(null)}>
             <Close fontSize="small" />
           </IconButton>
         </Box>
       )}
 
-      <Box sx={{ display: "flex", alignItems: "center", gap: "10px" }}>
-        {/* 📎 Fayl yuklash */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {/* Attach File */}
         <input
           type="file"
           ref={fileInputRef}
@@ -79,39 +71,43 @@ const ChatInput = ({
         <IconButton
           color="primary"
           onClick={() => fileInputRef.current?.click()}
+          aria-label="Attach file"
         >
           <AttachFile />
         </IconButton>
 
-        {/* ✍️ Input field */}
+        {/* Input & Emoji */}
         <ChatInputWrapper>
           <InputBase
             fullWidth
+            placeholder="Write a message..."
             value={message}
-            sx={{ ml: 1, flex: 1 }}
-            placeholder="Xabar yozing..."
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
+            sx={{ px: 1 }}
           />
-
-          {/* 😃 Emoji tugmasi */}
           <IconButton
             color="primary"
             onClick={(e) => setEmojiAnchor(e.currentTarget)}
+            aria-label="Add emoji"
           >
             <EmojiEmotions />
           </IconButton>
         </ChatInputWrapper>
 
-        {/* 📤 Yuborish tugmasi */}
+        {/* Send Button */}
         {(message.trim() || file) && (
-          <IconButton color="primary" onClick={handleSendMessage}>
+          <IconButton
+            color="primary"
+            onClick={handleSendMessage}
+            aria-label="Send message"
+          >
             <Send />
           </IconButton>
         )}
       </Box>
 
-      {/* 😃 Emoji picker modal */}
+      {/* Emoji Picker */}
       <Popover
         anchorEl={emojiAnchor}
         open={Boolean(emojiAnchor)}

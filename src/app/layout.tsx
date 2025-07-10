@@ -1,6 +1,8 @@
 "use client";
 
 // packages
+import { Provider } from "react-redux";
+import { ToastContainer } from "react-toastify";
 import { ThemeProvider } from "styled-components";
 import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
 
@@ -10,6 +12,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 // local
 import "./globals.css";
 import theme from "src/theme";
+import { store } from "src/redux/store";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,9 +34,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <MuiThemeProvider theme={theme}>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
-        </MuiThemeProvider>
+        <Provider store={store}>
+          <MuiThemeProvider theme={theme}>
+            <ThemeProvider theme={theme}>{children}</ThemeProvider>
+            <ToastContainer />
+          </MuiThemeProvider>
+        </Provider>
       </body>
     </html>
   );

@@ -46,11 +46,13 @@ const MessageBubble = styled(Box, {
 const ChatMessage = ({
   text,
   avatar,
+  fullName,
   isOwnMessage,
 }: {
   text: string;
-  isOwnMessage: boolean;
   avatar: string;
+  fullName: string;
+  isOwnMessage: boolean;
 }) => {
   return (
     <MessageWrapper
@@ -58,7 +60,11 @@ const ChatMessage = ({
         flexDirection: isOwnMessage ? "row-reverse" : "row",
       }}
     >
-      <Avatar src={avatar} alt="User Avatar" sx={{ width: 32, height: 32 }} />
+      {avatar ? (
+        <Avatar alt="User Avatar" src={avatar} sx={{ width: 32, height: 32 }} />
+      ) : (
+        <Avatar>{fullName.slice(0, 1)}</Avatar>
+      )}
       <MessageBubble isOwnMessage={isOwnMessage}>{text}</MessageBubble>
     </MessageWrapper>
   );

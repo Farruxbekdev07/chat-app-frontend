@@ -11,41 +11,53 @@ import {
   ListItemButton,
   ListItemAvatar,
 } from "@mui/material";
-import { useRouter } from "next/navigation";
 import React from "react";
+import { useDispatch } from "react-redux";
 
 // constants
-import { chats } from "src/constants/data";
+import { useUsersWithLastMessage } from "src/hooks/users";
+import { setSelectedUser } from "src/redux/messagesSlice";
 
 // styles
 import { DrawerContainer } from "src/styles/Sidebar";
 
 const Sidebar = () => {
-  const router = useRouter();
+  const dispatch = useDispatch();
 
-  const handleNavigate = () => {
-    router.push("/login");
+  const users = useUsersWithLastMessage();
+  console.log("users", users);
+
+  const handleNavigate = (user: {
+    uid: string;
+    fullName: string;
+    username: string;
+  }) => {
+    dispatch(setSelectedUser(user));
   };
 
   return (
     <DrawerContainer>
       <Drawer className="drawer" variant="permanent" anchor="left">
         <List>
-          {chats.map(({ id, person, primary, secondary }) => (
-            <ListItem disablePadding key={id}>
-              <ListItemButton onClick={handleNavigate}>
+          {users.map(({ uid, fullName, lastMessage, image, username }) => (
+            <ListItem disablePadding key={uid}>
+              <ListItemButton
+                onClick={() => handleNavigate({ uid, fullName, username })}
+              >
                 <ListItemAvatar>
-                  {person ? (
-                    <Avatar alt="Profile Picture" src={person} />
+                  {image ? (
+                    <Avatar alt="Profile Picture" src={image} />
                   ) : (
-                    <Avatar>{primary.slice(0, 1)}</Avatar>
+                    <Avatar>{fullName.slice(0, 1)}</Avatar>
                   )}
                 </ListItemAvatar>
                 <ListItemText
-                  primary={primary}
+                  primary={fullName}
                   secondary={
                     <Typography noWrap variant="body2" color="textSecondary">
-                      {secondary}
+                      {lastMessage?.text
+                        ? lastMessage.text.slice(0, 30) + `…`
+                        : "No messages yet"}
                     </Typography>
                   }
                 />
