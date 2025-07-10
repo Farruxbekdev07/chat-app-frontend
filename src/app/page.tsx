@@ -24,18 +24,17 @@ import Sidebar from "src/components/Sidebar";
 import ChatWindow from "src/components/ChatWindow";
 
 // styles
-import { ChatWrapper } from "src/styles/Chat";
-import { SidebarWrapper } from "src/styles/Sidebar";
-import DashboardContainer from "src/styles/Dashboard";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
 import { logout } from "src/redux/authSlice";
 import { useRouter } from "next/navigation";
+import { clearSelectedUser } from "src/redux/messagesSlice";
 
 const drawerWidth = 300;
 const settings = ["Logout"];
 
 const Dashboard = () => {
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
@@ -43,8 +42,8 @@ const Dashboard = () => {
   const selectedUser = useSelector(
     (state: RootState) => state.message.selectedUser
   );
+  const currentUser = useSelector((state: RootState) => state.auth.user);
   const theme = useTheme();
-  const router = useRouter();
   const dispatch = useDispatch();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const user = useSelector((state: RootState) => state.auth.user);
@@ -62,8 +61,10 @@ const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    setAnchorElUser(null);
     dispatch(logout());
+    router.push("/login");
+    dispatch(clearSelectedUser());
+    setAnchorElUser(null);
   };
 
   useEffect(() => {
@@ -101,7 +102,7 @@ const Dashboard = () => {
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
-                  alt={selectedUser?.fullName}
+                  alt={currentUser?.displayName || "User"}
                   src="/static/images/avatar/2.jpg"
                 />
               </IconButton>
@@ -143,7 +144,7 @@ const Dashboard = () => {
           {/* Mobile drawer */}
           <Drawer
             variant="temporary"
-            open={mobileOpen}
+            open={!selectedUser ? true : mobileOpen}
             onClose={handleDrawerToggle}
             ModalProps={{ keepMounted: true }}
             sx={{
@@ -182,17 +183,22 @@ const Dashboard = () => {
             mt: 8,
           }}
         >
-          <ChatWindow />
+          {selectedUser ? (
+            <ChatWindow />
+          ) : (
+            <Box
+              sx={{
+                height: "calc(100vh - 64px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Please select a user
+            </Box>
+          )}
         </Box>
       </Box>
-      {/* <DashboardContainer>
-        <SidebarWrapper>
-          <Sidebar />
-        </SidebarWrapper>
-        <ChatWrapper>
-          <ChatWindow />
-        </ChatWrapper>
-      </DashboardContainer> */}
     </>
   );
 };

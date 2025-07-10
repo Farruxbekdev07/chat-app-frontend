@@ -31,6 +31,7 @@ import { setUser } from "src/redux/authSlice";
 import { UserFormData } from "src/types/user";
 import { StyledLogin } from "src/styles/Login";
 import { auth, db } from "src/firebase/config";
+import { FirebaseError } from "firebase/app";
 
 const AuthPage = () => {
   const router = useRouter();
@@ -39,12 +40,7 @@ const AuthPage = () => {
 
   const dispatch = useDispatch();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm({
+  const { control, handleSubmit, reset } = useForm({
     mode: "onBlur",
     defaultValues: {
       fullName: "",
@@ -119,7 +115,7 @@ const AuthPage = () => {
         toast.success("User signed up successfully!");
         router.push("/");
       }
-    } catch (error: any) {
+    } catch (error: FirebaseError | any) {
       if (error?.code === "auth/invalid-credential") {
         toast.error("Invalid email or password.");
       } else if (error?.code === "auth/email-already-in-use") {
@@ -130,7 +126,7 @@ const AuthPage = () => {
     }
   };
 
-  const handleTabChange = (_: any, newValue: number) => {
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     setShowPassword(false);
     setTab(newValue);
     reset();
