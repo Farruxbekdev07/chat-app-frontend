@@ -17,14 +17,27 @@ import {
   FormControl,
   InputAdornment,
 } from "@mui/material";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  updateProfile,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 
 // styles
+import { setUser } from "src/redux/authSlice";
+import { UserFormData } from "src/types/user";
 import { StyledLogin } from "src/styles/Login";
+import { auth, db } from "src/firebase/config";
 
 const AuthPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [tab, setTab] = useState(0);
+
+  const dispatch = useDispatch();
 
   const {
     control,
@@ -41,13 +54,79 @@ const AuthPage = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    if (tab === 0) {
-      console.log("Login data:", data);
-      // login logic
-    } else {
-      console.log("SignUp data:", data);
-      // signup logic
+  const onSubmit = async (data: UserFormData) => {
+    try {
+      if (tab === 0) {
+        // LOGIN
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password
+        );
+        const user = userCredential.user;
+
+        // Firestore'dan username olish
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        const userData = userDoc.data();
+
+        const token = await user.getIdToken();
+
+        dispatch(
+          setUser({
+            uid: user.uid,
+            email: user.email!,
+            displayName: user.displayName,
+            username: userData?.username || "",
+            accessToken: token,
+          })
+        );
+
+        toast.success("User logged in successfully!");
+        router.push("/");
+      } else {
+        // SIGNUP
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password
+        );
+        const user = userCredential.user;
+
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email: user.email,
+          fullName: data.fullName,
+          username: data.username,
+          createdAt: serverTimestamp(),
+        });
+
+        await updateProfile(user, {
+          displayName: data.fullName,
+        });
+
+        const token = await user.getIdToken();
+
+        dispatch(
+          setUser({
+            uid: user.uid,
+            email: user.email!,
+            displayName: data.fullName,
+            username: data.username,
+            accessToken: token,
+          })
+        );
+
+        toast.success("User signed up successfully!");
+        router.push("/");
+      }
+    } catch (error: any) {
+      if (error?.code === "auth/invalid-credential") {
+        toast.error("Invalid email or password.");
+      } else if (error?.code === "auth/email-already-in-use") {
+        toast.error("Email already in use. Please use a different email.");
+      } else {
+        toast.error(error?.message || "Something went wrong.");
+      }
     }
   };
 
@@ -116,11 +195,16 @@ const AuthPage = () => {
               control={control}
               rules={{
                 required: "Please input your email address!",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Invalid email format",
+                },
               }}
               render={({ field, fieldState: { error } }) => (
                 <FormControl fullWidth>
                   <TextField
                     {...field}
+                    type="email"
                     label="Email"
                     margin="normal"
                     error={!!error}

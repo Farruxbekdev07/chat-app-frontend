@@ -17,6 +17,15 @@ const MessagesContainer = styled.div`
   flex: 1;
   padding: 15px;
   overflow-y: auto;
+
+  .no-messages {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+  }
 `;
 
 const InputContainer = styled.div`

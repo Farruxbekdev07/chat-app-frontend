@@ -10,23 +10,36 @@ import ChatMessage from "./MessageBubble";
 import { ChatContainer, MessagesContainer } from "src/styles/Chat";
 
 // data
-import { messages } from "src/constants/data";
+import { useSelector } from "react-redux";
+import { RootState } from "src/redux/store";
+import { useChatMessages, useSendMessage } from "src/hooks/useMessages";
 
 const ChatWindow = () => {
+  const selectedUser = useSelector(
+    (state: RootState) => state.message.selectedUser
+  );
+  const messages = useChatMessages();
+  const currentUser = useSelector((state: RootState) => state.auth.user);
+  const sendMessage = useSendMessage();
+
   const handleSendMessage = (message: string) => {
-    console.log("Sended message:", message);
+    sendMessage(message);
   };
 
   return (
     <ChatContainer>
-      <Header name="John Doe" />
+      <Header name={selectedUser?.fullName || ""} />
       <MessagesContainer>
-        {messages?.map(({ id, text, avatar, isOwnMessage }) => (
+        {messages?.length === 0 && (
+          <div className="no-messages">No messages yet</div>
+        )}
+        {messages?.map(({ senderId, text, fullName }) => (
           <ChatMessage
-            key={id}
             text={text}
-            avatar={avatar}
-            isOwnMessage={isOwnMessage}
+            avatar={""}
+            key={senderId}
+            fullName={fullName}
+            isOwnMessage={senderId === currentUser?.uid}
           />
         ))}
       </MessagesContainer>
