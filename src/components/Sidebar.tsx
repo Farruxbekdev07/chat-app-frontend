@@ -21,7 +21,7 @@ import { setSelectedUser } from "src/redux/messagesSlice";
 // styles
 import { DrawerContainer } from "src/styles/Sidebar";
 
-const Sidebar = () => {
+const Sidebar = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
   const dispatch = useDispatch();
 
   const users = useUsersWithLastMessage();
@@ -33,40 +33,37 @@ const Sidebar = () => {
     username: string;
   }) => {
     dispatch(setSelectedUser(user));
+    setOpen(false);
   };
 
   return (
-    <DrawerContainer>
-      <Drawer className="drawer" variant="permanent" anchor="left">
-        <List>
-          {users.map(({ uid, fullName, lastMessage, image, username }) => (
-            <ListItem disablePadding key={uid}>
-              <ListItemButton
-                onClick={() => handleNavigate({ uid, fullName, username })}
-              >
-                <ListItemAvatar>
-                  {image ? (
-                    <Avatar alt="Profile Picture" src={image} />
-                  ) : (
-                    <Avatar>{fullName.slice(0, 1)}</Avatar>
-                  )}
-                </ListItemAvatar>
-                <ListItemText
-                  primary={fullName}
-                  secondary={
-                    <Typography noWrap variant="body2" color="textSecondary">
-                      {lastMessage?.text
-                        ? lastMessage.text.slice(0, 30) + `…`
-                        : "No messages yet"}
-                    </Typography>
-                  }
-                />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Drawer>
-    </DrawerContainer>
+    <List>
+      {users.map(({ uid, fullName, lastMessage, image, username }) => (
+        <ListItem disablePadding key={uid}>
+          <ListItemButton
+            onClick={() => handleNavigate({ uid, fullName, username })}
+          >
+            <ListItemAvatar>
+              {image ? (
+                <Avatar alt="Profile Picture" src={image} />
+              ) : (
+                <Avatar>{fullName.slice(0, 1)}</Avatar>
+              )}
+            </ListItemAvatar>
+            <ListItemText
+              primary={fullName}
+              secondary={
+                <Typography noWrap variant="body2" color="textSecondary">
+                  {lastMessage?.text
+                    ? lastMessage.text.slice(0, 30) + `…`
+                    : "No messages yet"}
+                </Typography>
+              }
+            />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </List>
   );
 };
 

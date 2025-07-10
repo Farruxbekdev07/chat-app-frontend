@@ -5,10 +5,11 @@ const ChatWrapper = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
+  border: 1px solid red;
 `;
 
 const ChatContainer = styled.div`
-  height: 100%;
+  height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
 `;
@@ -19,12 +20,12 @@ const MessagesContainer = styled.div`
   overflow-y: auto;
 
   .no-messages {
+    color: white;
     height: 100%;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
     font-size: 18px;
+    align-items: center;
+    justify-content: center;
   }
 `;
 
@@ -37,19 +38,19 @@ const InputContainer = styled.div`
 `;
 
 const ChatInputWrapper = styled(Paper)(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: "5px 10px",
-  borderRadius: "25px",
-  backgroundColor: theme.palette.background.paper,
-  boxShadow: theme.shadows[2],
   flex: 1,
+  display: "flex",
+  padding: "5px 10px",
+  alignItems: "center",
+  borderRadius: "25px",
+  boxShadow: theme.shadows[2],
+  backgroundColor: theme.palette.background.paper,
 }));
 
 export {
   ChatWrapper,
   ChatContainer,
   InputContainer,
-  MessagesContainer,
   ChatInputWrapper,
+  MessagesContainer,
 };

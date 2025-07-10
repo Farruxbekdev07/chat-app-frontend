@@ -10,6 +10,9 @@ import { pxToRem } from "src/utils";
 const drawerWidth = 350;
 
 const SidebarWrapper = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   width: 25%;
   min-width: ${pxToRem(280)};
   max-width: ${pxToRem(drawerWidth)};
@@ -19,14 +22,16 @@ const SidebarWrapper = styled.div`
 
 const DrawerContainer = styled.div`
   .drawer {
-    flex: 1;
-    flex-shrink: 0;
+    width: 100%;
     min-width: ${pxToRem(280)};
     max-width: ${pxToRem(drawerWidth)};
+    border: 1px solid red;
 
     .MuiDrawer-paper {
       box-sizing: border-box;
+      border: 1px solid blue;
       width: ${pxToRem(drawerWidth)};
+      /* width: 100%; */
     }
   }
 `;

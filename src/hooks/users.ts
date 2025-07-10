@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { collection, doc, getDoc, onSnapshot, query } from "firebase/firestore";
+import {
+  collection,
+  query,
+  onSnapshot,
+  orderBy,
+  limit,
+  getDocs,
+} from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
 import { db } from "src/firebase/config";
@@ -14,27 +21,6 @@ interface UserWithLastMessage {
     createdAt: any;
   };
 }
-
-export const useUsers = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const currentUid = useSelector((state: RootState) => state.auth.user?.uid);
-
-  useEffect(() => {
-    const q = query(collection(db, "users"));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const userList = snapshot.docs
-        .map((doc) => doc.data())
-        .filter((user) => user.uid !== currentUid);
-
-      setUsers(userList);
-    });
-
-    return () => unsubscribe();
-  }, [currentUid]);
-
-  return users;
-};
 
 export const useUsersWithLastMessage = () => {
   const [userList, setUserList] = useState<UserWithLastMessage[]>([]);
@@ -51,22 +37,26 @@ export const useUsersWithLastMessage = () => {
         if (user.uid === currentUser.uid) continue;
 
         const chatId = [currentUser.uid, user.uid].sort().join("_");
-        const chatRef = doc(db, "chats", chatId);
-        const chatSnap = await getDoc(chatRef);
+        const messagesRef = collection(db, "chats", chatId, "messages");
 
-        const lastMsg = chatSnap.exists() ? chatSnap.data().lastMessage : null;
+        const q = query(messagesRef, orderBy("createdAt", "desc"), limit(1));
+        const messageSnapshot = await getDocs(q);
+
+        let lastMessage;
+        if (!messageSnapshot.empty) {
+          const msgDoc = messageSnapshot.docs[0].data();
+          lastMessage = {
+            text: msgDoc.text,
+            createdAt: msgDoc.createdAt,
+          };
+        }
 
         usersWithMsg.push({
           uid: user.uid,
           fullName: user.fullName,
           username: user.username,
           image: "",
-          lastMessage: lastMsg
-            ? {
-                text: lastMsg.text,
-                createdAt: lastMsg.createdAt,
-              }
-            : undefined,
+          lastMessage,
         });
       }
 
