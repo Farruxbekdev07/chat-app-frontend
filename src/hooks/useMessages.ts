@@ -12,9 +12,10 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { db } from "src/firebase/config";
 import { RootState } from "src/redux/store";
+import { Message } from "src/types/message";
 
 export const useChatMessages = () => {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const selectedUser = useSelector(
     (state: RootState) => state.message.selectedUser
   );
@@ -31,7 +32,13 @@ export const useChatMessages = () => {
     );
 
     const unsub = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map((doc) => doc.data());
+      const msgs: Message[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        text: doc.data().text,
+        senderId: doc.data().senderId,
+        senderName: doc.data().senderName,
+        createdAt: doc.data().createdAt,
+      }));
       setMessages(msgs);
     });
 

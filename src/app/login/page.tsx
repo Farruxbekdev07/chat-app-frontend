@@ -14,7 +14,6 @@ import {
   TextField,
   Typography,
   IconButton,
-  FormControl,
   InputAdornment,
 } from "@mui/material";
 import { toast } from "react-toastify";
@@ -25,22 +24,21 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
 
-// styles
+// local
 import { setUser } from "src/redux/authSlice";
 import { UserFormData } from "src/types/user";
 import { StyledLogin } from "src/styles/Login";
 import { auth, db } from "src/firebase/config";
-import { FirebaseError } from "firebase/app";
 
-const AuthPage = () => {
+const AuthPage: React.FC = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [tab, setTab] = useState(0);
-
   const dispatch = useDispatch();
 
-  const { control, handleSubmit, reset } = useForm({
+  const { control, handleSubmit, reset } = useForm<UserFormData>({
     mode: "onBlur",
     defaultValues: {
       fullName: "",
@@ -60,18 +58,15 @@ const AuthPage = () => {
           data.password
         );
         const user = userCredential.user;
-
-        // Firestore'dan username olish
         const userDoc = await getDoc(doc(db, "users", user.uid));
         const userData = userDoc.data();
-
         const token = await user.getIdToken();
 
         dispatch(
           setUser({
             uid: user.uid,
-            email: user.email!,
-            displayName: user.displayName,
+            email: user.email || "",
+            displayName: user.displayName || "",
             username: userData?.username || "",
             accessToken: token,
           })
@@ -105,7 +100,7 @@ const AuthPage = () => {
         dispatch(
           setUser({
             uid: user.uid,
-            email: user.email!,
+            email: user.email || "",
             displayName: data.fullName,
             username: data.username,
             accessToken: token,
@@ -115,13 +110,14 @@ const AuthPage = () => {
         toast.success("User signed up successfully!");
         router.push("/");
       }
-    } catch (error: FirebaseError | any) {
-      if (error?.code === "auth/invalid-credential") {
+    } catch (error: unknown) {
+      const firebaseError = error as FirebaseError;
+      if (firebaseError.code === "auth/invalid-credential") {
         toast.error("Invalid email or password.");
-      } else if (error?.code === "auth/email-already-in-use") {
-        toast.error("Email already in use. Please use a different email.");
+      } else if (firebaseError.code === "auth/email-already-in-use") {
+        toast.error("Email already in use.");
       } else {
-        toast.error(error?.message || "Something went wrong.");
+        toast.error(firebaseError.message || "Something went wrong.");
       }
     }
   };
@@ -190,25 +186,25 @@ const AuthPage = () => {
               name="email"
               control={control}
               rules={{
-                required: "Please input your email address!",
+                required: "Please input your email!",
                 pattern: {
                   value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                   message: "Invalid email format",
                 },
               }}
               render={({ field, fieldState: { error } }) => (
-                <FormControl fullWidth>
-                  <TextField
-                    {...field}
-                    type="email"
-                    label="Email"
-                    margin="normal"
-                    error={!!error}
-                    helperText={error?.message}
-                  />
-                </FormControl>
+                <TextField
+                  {...field}
+                  label="Email"
+                  type="email"
+                  fullWidth
+                  margin="normal"
+                  error={!!error}
+                  helperText={error?.message}
+                />
               )}
             />
+
             <Controller
               name="password"
               control={control}
@@ -216,18 +212,18 @@ const AuthPage = () => {
                 required: "Please input your password!",
                 minLength: {
                   value: 6,
-                  message: "Password must be at least 6 characters long",
+                  message: "Password must be at least 6 characters",
                 },
               }}
               render={({ field, fieldState: { error } }) => (
                 <TextField
                   {...field}
                   label="Password"
+                  type={showPassword ? "text" : "password"}
                   fullWidth
                   margin="normal"
                   error={!!error}
                   helperText={error?.message}
-                  type={showPassword ? "text" : "password"}
                   InputProps={{
                     endAdornment: (
                       <InputAdornment position="end">
