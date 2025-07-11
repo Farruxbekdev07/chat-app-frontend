@@ -3,7 +3,7 @@
 import React, { useState, useRef } from "react";
 import { Box, IconButton, InputBase, Typography, Popover } from "@mui/material";
 import { Send, AttachFile, EmojiEmotions, Close } from "@mui/icons-material";
-import EmojiPicker from "emoji-picker-react";
+import EmojiPicker, { EmojiClickData } from "emoji-picker-react";
 import { ChatInputWrapper } from "src/styles/Chat";
 
 interface Props {
@@ -25,7 +25,7 @@ const ChatInput = ({ onSend }: Props) => {
     setFile(null);
   };
 
-  const handleEmojiClick = (emojiData: any) => {
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
     setMessage((prev) => prev + (emojiData.emoji || ""));
   };
 

@@ -3,7 +3,6 @@
 // packages
 import {
   List,
-  Drawer,
   Avatar,
   ListItem,
   Typography,
@@ -17,9 +16,6 @@ import { useDispatch } from "react-redux";
 // constants
 import { useUsersWithLastMessage } from "src/hooks/users";
 import { setSelectedUser } from "src/redux/messagesSlice";
-
-// styles
-import { DrawerContainer } from "src/styles/Sidebar";
 
 const Sidebar = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
   const dispatch = useDispatch();

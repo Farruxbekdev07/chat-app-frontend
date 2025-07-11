@@ -4,4 +4,5 @@ export interface Message {
   senderId: string;
   senderName: string;
   createdAt: string;
+  fullName?: string;
 }

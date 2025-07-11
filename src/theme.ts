@@ -2,7 +2,7 @@
 
 import { createTheme } from "@mui/material/styles";
 
-const theme = createTheme({
+const baseTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
@@ -73,5 +73,12 @@ const theme = createTheme({
     },
   },
 });
+
+const theme = {
+  ...baseTheme,
+  customColors: {
+    primaryLight: "#bbdefb", // bu sizga kerakli custom color
+  },
+};
 
 export default theme;

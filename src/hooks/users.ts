@@ -6,6 +6,7 @@ import {
   orderBy,
   limit,
   getDocs,
+  Timestamp,
 } from "firebase/firestore";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
@@ -18,7 +19,7 @@ interface UserWithLastMessage {
   username: string;
   lastMessage?: {
     text: string;
-    createdAt: any;
+    createdAt: Timestamp;
   };
 }
 

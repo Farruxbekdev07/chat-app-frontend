@@ -71,7 +71,7 @@ const Dashboard = () => {
     if (!user) {
       router.push("/login");
     }
-  }, [user]);
+  }, [user, router]);
 
   return (
     <>
