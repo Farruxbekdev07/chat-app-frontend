@@ -36,7 +36,7 @@ export const useChatMessages = () => {
     );
 
     const unsub = onSnapshot(q, (snapshot) => {
-      const msgs: Message[] = snapshot.docs.map((doc, idx, arr) => {
+      const msgs: Message[] = snapshot.docs.map((doc) => {
         const data = doc.data();
 
         if (

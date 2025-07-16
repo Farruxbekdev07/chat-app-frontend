@@ -3,37 +3,29 @@
 import {
   Box,
   List,
-  Badge,
   Avatar,
+  Drawer,
   Divider,
   ListItem,
   TextField,
+  IconButton,
   Typography,
   ListItemText,
-  ListItemButton,
-  ListItemAvatar,
-  IconButton,
-  Drawer,
   ListItemIcon,
+  ListItemButton,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import React, { useState, useMemo } from "react";
-import CheckIcon from "@mui/icons-material/Check";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout, Close as CloseIcon } from "@mui/icons-material";
-import { green } from "@mui/material/colors";
 
-import { RootState } from "src/redux/store";
-import { clearSelectedUser, setSelectedUser } from "src/redux/messagesSlice";
-import { useUsersWithLastMessage, useAllUsers } from "src/hooks/users";
-import { formatDistanceToNow } from "date-fns";
 import { pxToRem } from "src/utils";
-import { DRAWER_WIDTH } from "src/constants";
-import { logout } from "src/redux/authSlice";
-import { useRouter } from "next/navigation";
-import { useOnlineStatus } from "src/hooks/useUserStatus";
 import UserListItem from "./UserListItem";
+import { RootState } from "src/redux/store";
+import { useRouter } from "next/navigation";
+import { logout, setLoading } from "src/redux/authSlice";
+import { useUsersWithLastMessage, useAllUsers } from "src/hooks/users";
+import { clearSelectedUser, setSelectedUser } from "src/redux/messagesSlice";
 
 const Sidebar = () => {
   const router = useRouter();
@@ -75,6 +67,7 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     router.push("/login");
+    dispatch(setLoading(true));
     setOpenDrawer(false);
     dispatch(logout());
     dispatch(clearSelectedUser());
@@ -87,9 +80,9 @@ const Sidebar = () => {
       <Box
         sx={{
           gap: pxToRem(8),
-          height: "64px",
-          padding: "4px",
           display: "flex",
+          height: pxToRem(64),
+          padding: pxToRem(4),
           alignItems: "center",
           justifyContent: "center",
         }}
@@ -136,7 +129,7 @@ const Sidebar = () => {
             align="center"
             sx={{ margin: 4 }}
           >
-            You haven't corresponded with anyone yet. Find a new user using the
+            You have not corresponded with anyone yet. Find a new user using the
             search.
           </Typography>
         )}
@@ -147,16 +140,7 @@ const Sidebar = () => {
         variant="temporary"
         ModalProps={{ keepMounted: true }}
         onClose={() => setOpenDrawer(false)}
-        sx={{
-          "& .MuiDrawer-paper": {
-            width: "300px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          },
-        }}
       >
-        {/* Yuqori qism */}
         <Box>
           <Box
             display="flex"
@@ -185,7 +169,6 @@ const Sidebar = () => {
           <Divider sx={{ my: 2 }} />
         </Box>
 
-        {/* Pastki qism: Logout */}
         <Box p={2}>
           <ListItem disablePadding>
             <ListItemButton onClick={handleLogout}>

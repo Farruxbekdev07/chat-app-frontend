@@ -12,8 +12,8 @@ const UserStatus = () => {
   );
 
   const { isTyping, isOnline, lastSeen } = useUserStatus(
-    currentUser?.uid,
-    selectedUser?.uid
+    currentUser?.uid || "",
+    selectedUser?.uid || ""
   );
 
   if (!selectedUser) return null;

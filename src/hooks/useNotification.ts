@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { db } from "src/firebase/config";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
-export const useNotification = (userId: string | undefined) => {
+export const useNotification = (userId: string) => {
   useEffect(() => {
     if (!userId) return;
 

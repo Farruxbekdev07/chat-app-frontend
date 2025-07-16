@@ -1,20 +1,20 @@
 "use client";
 
 import {
-  Avatar,
-  Badge,
   Box,
+  Badge,
+  Avatar,
   ListItem,
+  Typography,
+  ListItemText,
   ListItemAvatar,
   ListItemButton,
-  ListItemText,
-  Typography,
 } from "@mui/material";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
-import CheckIcon from "@mui/icons-material/Check";
 import { formatDistanceToNow } from "date-fns";
-import { useOnlineStatus, useTypingStatus } from "src/hooks/useUserStatus";
+import CheckIcon from "@mui/icons-material/Check";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { UserWithLastMessage } from "src/hooks/users";
+import { useOnlineStatus, useTypingStatus } from "src/hooks/useUserStatus";
 
 const UserListItem = ({
   user,

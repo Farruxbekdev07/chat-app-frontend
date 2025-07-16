@@ -1,26 +1,25 @@
 import { useEffect, useState } from "react";
 import {
-  collection,
-  query,
-  orderBy,
-  limit,
-  getDocs,
-  onSnapshot,
-  Timestamp,
-  writeBatch,
   doc,
-  where,
+  query,
+  limit,
+  orderBy,
+  getDocs,
+  Timestamp,
+  onSnapshot,
+  writeBatch,
+  collection,
 } from "firebase/firestore";
+import { db } from "src/firebase/config";
 import { useSelector } from "react-redux";
 import { RootState } from "src/redux/store";
-import { db } from "src/firebase/config";
 
 interface LastMessage {
   text: string;
-  createdAt: Timestamp;
-  imageUrl?: string;
   seenBy: string[];
   senderId: string;
+  imageUrl?: string;
+  createdAt: Timestamp;
 }
 
 export interface UserWithLastMessage {
@@ -29,7 +28,7 @@ export interface UserWithLastMessage {
   fullName: string;
   username: string;
   unreadCount: number;
-  lastMessage?: LastMessage;
+  lastMessage?: LastMessage | null;
 }
 
 interface User {
@@ -60,48 +59,53 @@ export const useUsersWithLastMessage = () => {
           const chatId = [currentUser.uid, user.uid].sort().join("_");
           const messagesRef = collection(db, "chats", chatId, "messages");
 
-          const q = query(messagesRef, orderBy("createdAt", "desc"), limit(1));
+          const q = query(messagesRef, orderBy("createdAt", "desc"), limit(10));
 
           const unsubscribeMsg = onSnapshot(q, (msgSnapshot) => {
-            if (!msgSnapshot.empty) {
-              const msgData = msgSnapshot.docs[0].data();
+            let validMessages = msgSnapshot.docs
+              .map((d) => d.data())
+              .filter((m) => m.text || m.imageUrl); // faqat o‘chirilmagan xabarlar
 
-              const lastMessage: LastMessage = {
-                text: msgData.text || "",
-                createdAt: msgData.createdAt,
-                imageUrl: msgData.imageUrl,
-                seenBy: msgData.seenBy || [],
-                senderId: msgData.senderId || "",
+            const lastMsgData = validMessages[0] || null;
+
+            let lastMessage: LastMessage | null = null;
+            let unreadCount = 0;
+
+            if (lastMsgData) {
+              lastMessage = {
+                text: lastMsgData.text || "",
+                createdAt: lastMsgData.createdAt,
+                imageUrl: lastMsgData.imageUrl,
+                seenBy: lastMsgData.seenBy || [],
+                senderId: lastMsgData.senderId || "",
               };
 
-              // Faqat qarshi user yuborgan va siz hali o‘qimagan bo‘lsa unread hisoblanadi
-              const isUnread =
+              unreadCount =
                 lastMessage.senderId === user.uid &&
-                !lastMessage.seenBy.includes(currentUser.uid);
-
-              const userObj: UserWithLastMessage = {
-                uid: user.uid,
-                image: user.image || "",
-                fullName: user.fullName,
-                username: user.username,
-                lastMessage,
-                unreadCount: isUnread ? 1 : 0, // faqat 1 ta oxirgi xabar uchun hisoblanadi
-              };
-
-              setUserList((prev) => {
-                const updated = prev.filter((u) => u.uid !== user.uid);
-                const newList = [...updated, userObj];
-                newList.sort((a, b) => {
-                  const aTime = a.lastMessage?.createdAt?.toMillis?.() || 0;
-                  const bTime = b.lastMessage?.createdAt?.toMillis?.() || 0;
-                  return bTime - aTime;
-                });
-                return newList;
-              });
-            } else {
-              // message yo‘q bo‘lsa, listdan chiqaramiz
-              setUserList((prev) => prev.filter((u) => u.uid !== user.uid));
+                !lastMessage.seenBy.includes(currentUser.uid)
+                  ? 1
+                  : 0;
             }
+
+            const userObj: UserWithLastMessage = {
+              uid: user.uid,
+              image: user.image || "",
+              fullName: user.fullName,
+              username: user.username,
+              lastMessage,
+              unreadCount,
+            };
+
+            setUserList((prev) => {
+              const updated = prev.filter((u) => u.uid !== user.uid);
+              const newList = [...updated, userObj];
+              newList.sort((a, b) => {
+                const aTime = a.lastMessage?.createdAt?.toMillis?.() || 0;
+                const bTime = b.lastMessage?.createdAt?.toMillis?.() || 0;
+                return bTime - aTime;
+              });
+              return newList;
+            });
           });
 
           unsubscribers.push(unsubscribeMsg);
@@ -163,8 +167,6 @@ export const deleteChatWithUser = async (
       batch.delete(docSnap.ref);
     });
 
-    // Agar boshqa subcollectionlar bo‘lsa, ularga ham shunday delete qo‘shish mumkin
-    // Masalan, typingStatus:
     const typingStatusRef = doc(
       db,
       "chats",

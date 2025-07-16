@@ -10,7 +10,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -18,13 +17,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import theme from "src/theme";
 import UserStatus from "./UserStatus";
 import { RootState } from "src/redux/store";
-import { logout } from "src/redux/authSlice";
 import { deleteChatWithUser } from "src/hooks/users";
 import { clearSelectedUser } from "src/redux/messagesSlice";
 import { getDatabase, onValue, ref } from "firebase/database";
 
 const Header = () => {
-  const router = useRouter();
   const dispatch = useDispatch();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const currentUser = useSelector((state: RootState) => state.auth.user);
@@ -36,12 +33,6 @@ const Header = () => {
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) =>
     setAnchorElUser(event.currentTarget);
   const handleCloseUserMenu = () => setAnchorElUser(null);
-  const handleLogout = () => {
-    dispatch(logout());
-    dispatch(clearSelectedUser());
-    router.push("/login");
-    setAnchorElUser(null);
-  };
 
   const handleCloseDrawer = () => {
     dispatch(clearSelectedUser());

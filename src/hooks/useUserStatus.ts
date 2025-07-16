@@ -13,8 +13,8 @@ import { RootState } from "src/redux/store";
  */
 
 export const useUserStatus = (
-  currentUserId: string | undefined,
-  selectedUserId: string | undefined
+  currentUserId: string,
+  selectedUserId: string
 ) => {
   const [isTyping, setIsTyping] = useState(false);
   const [isOnline, setIsOnline] = useState(false);
@@ -93,7 +93,7 @@ export const useOnlineStatusWriter = () => {
   }, [currentUser?.uid]);
 };
 
-export const useOnlineStatus = (userId: string | undefined) => {
+export const useOnlineStatus = (userId: string) => {
   const [isOnline, setIsOnline] = useState(false);
 
   useEffect(() => {
@@ -112,10 +112,7 @@ export const useOnlineStatus = (userId: string | undefined) => {
   return isOnline;
 };
 
-export const useTypingStatus = (
-  currentUserId: string | undefined,
-  userId: string | undefined
-) => {
+export const useTypingStatus = (currentUserId: string, userId: string) => {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {

@@ -9,6 +9,7 @@ import ChatInput from "src/components/ChatInput";
 import { ChatContainer, MessagesContainer } from "src/styles/Chat";
 import { useChatMessages, useSendMessage } from "src/hooks/useMessages";
 import { Timestamp } from "@google-cloud/firestore";
+import { Box } from "@mui/material";
 
 interface MessageType {
   id: string;
@@ -134,14 +135,23 @@ const ChatWindow = () => {
         <div ref={bottomRef} />
       </MessagesContainer>
 
-      {selectedUser && (
-        <ChatInput
-          onSend={handleSendMessage}
-          onEdit={handleEditMessage}
-          editingMessage={editingMessage}
-          onCancelEdit={() => setEditingMessage(null)}
-        />
-      )}
+      <Box
+        sx={{
+          bottom: 0,
+          zIndex: 1,
+          position: "sticky",
+          bgcolor: "background.paper",
+        }}
+      >
+        {selectedUser && (
+          <ChatInput
+            onSend={handleSendMessage}
+            onEdit={handleEditMessage}
+            editingMessage={editingMessage}
+            onCancelEdit={() => setEditingMessage(null)}
+          />
+        )}
+      </Box>
     </ChatContainer>
   );
 };

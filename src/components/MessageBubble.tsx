@@ -9,8 +9,10 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { MessageBubble, MessageWrapper } from "src/styles/Messages";
+import { pxToRem } from "src/utils";
+import Image from "next/image";
 
 interface Props {
   text: string;
@@ -65,13 +67,15 @@ const ChatMessage = ({
         style={{ position: "relative" }}
       >
         {imageUrl && (
-          <img
+          <Image
             src={imageUrl}
             alt="sent"
+            width={500}
+            height={300}
             style={{
+              width: "100%",
               height: "auto",
-              maxWidth: "100%",
-              borderRadius: "10px",
+              borderRadius: pxToRem(10),
               marginBottom: text ? 8 : 4,
             }}
           />
@@ -82,11 +86,11 @@ const ChatMessage = ({
         {createdAt && (
           <Box
             sx={{
-              gap: "4px",
+              gap: pxToRem(4),
               display: "flex",
-              fontSize: "14px",
-              marginTop: "6px",
               alignItems: "center",
+              fontSize: pxToRem(14),
+              marginTop: pxToRem(6),
               justifyContent: "flex-end",
               color: "rgba(255,255,255,0.7)",
             }}
@@ -100,9 +104,9 @@ const ChatMessage = ({
             {isOwnMessage &&
               isLastMessage &&
               (seenBy.length > 1 ? (
-                <DoneAllIcon sx={{ fontSize: "18px", color: "white" }} />
+                <DoneAllIcon sx={{ fontSize: pxToRem(18), color: "white" }} />
               ) : (
-                <CheckIcon sx={{ fontSize: "18px", color: "white" }} />
+                <CheckIcon sx={{ fontSize: pxToRem(18), color: "white" }} />
               ))}
           </Box>
         )}

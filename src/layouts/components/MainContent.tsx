@@ -4,6 +4,7 @@ import theme from "src/theme";
 import Header from "src/components/Header";
 import { DRAWER_WIDTH } from "src/constants";
 import ChatWindow from "src/components/ChatWindow";
+import { pxToRem } from "src/utils";
 
 const MainContent = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -15,13 +16,13 @@ const MainContent = () => {
         flexGrow: 1,
         display: "flex",
         flexDirection: "column",
-        width: { sm: `calc(100% - ${isMobile ? 0 : DRAWER_WIDTH}px)` },
+        width: { sm: `calc(100% - ${pxToRem(isMobile ? 0 : DRAWER_WIDTH)})` },
       }}
     >
       <AppBar
-        position="static"
+        position="fixed"
         sx={{
-          width: "100%",
+          width: `calc(100% - ${pxToRem(isMobile ? 0 : DRAWER_WIDTH)})`,
         }}
       >
         <Header />
@@ -32,7 +33,8 @@ const MainContent = () => {
           flex: 1,
           width: "100%",
           display: "flex",
-          height: "calc(100% - 64px)",
+          paddingTop: pxToRem(64),
+          height: `calc(100% - ${pxToRem(64)})`,
           background: `url(./background.png) center center / cover no-repeat`,
         }}
       >

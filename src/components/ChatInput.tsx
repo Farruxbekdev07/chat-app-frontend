@@ -148,7 +148,7 @@ const ChatInput = ({ onSend, onEdit, editingMessage, onCancelEdit }: Props) => {
   };
 
   return (
-    <Box sx={{ position: "relative", p: 1.5 }}>
+    <Box sx={{ position: "relative", p: 1.5, background: "transparent" }}>
       <input
         type="file"
         ref={fileInputRef}
@@ -157,15 +157,22 @@ const ChatInput = ({ onSend, onEdit, editingMessage, onCancelEdit }: Props) => {
         accept="image/*"
       />
 
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Box
+        sx={{
+          gap: 1,
+          display: "flex",
+          alignItems: "center",
+          background: "transparent",
+        }}
+      >
         <IconButton onClick={() => fileInputRef.current?.click()}>
           <AttachFile />
         </IconButton>
 
         <ChatInputWrapper>
           <InputBase
-            inputRef={inputRef}
             fullWidth
+            inputRef={inputRef}
             placeholder={
               editingMessage ? "Edit message..." : "Write a message..."
             }
