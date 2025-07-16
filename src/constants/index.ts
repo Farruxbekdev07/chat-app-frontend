@@ -1,3 +1,4 @@
 const OTP_LENGTH = 6;
+const DRAWER_WIDTH = 400;
 
-export { OTP_LENGTH };
+export { OTP_LENGTH, DRAWER_WIDTH };

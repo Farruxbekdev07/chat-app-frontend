@@ -6,8 +6,8 @@ export interface UserFormData {
 }
 
 export interface AuthUser {
-  displayName: string | null;
   accessToken?: string;
+  displayName: string;
   username?: string;
   email: string;
   uid: string;
