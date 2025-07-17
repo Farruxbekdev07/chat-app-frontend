@@ -31,6 +31,7 @@ import { setUser } from "src/redux/authSlice";
 import { UserFormData } from "src/types/user";
 import { StyledLogin } from "src/styles/Login";
 import { auth, db } from "src/firebase/config";
+import { pxToRem } from "src/utils";
 
 const AuthPage: React.FC = () => {
   const router = useRouter();
@@ -134,7 +135,12 @@ const AuthPage: React.FC = () => {
         container
         alignItems="center"
         justifyContent="center"
-        className="grid-container"
+        sx={{
+          width: "100%",
+          minHeight: "100vh",
+          height: "fit-content",
+          padding: `${pxToRem(50)} 0`,
+        }}
       >
         <Grid item xs={10} sm={8} md={4}>
           <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
