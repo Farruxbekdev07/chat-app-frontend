@@ -64,28 +64,27 @@ export const useUsersWithLastMessage = () => {
           const unsubscribeMsg = onSnapshot(q, (msgSnapshot) => {
             const validMessages = msgSnapshot.docs
               .map((d) => d.data())
-              .filter((m) => m.text || m.imageUrl); // faqat o‘chirilmagan xabarlar
+              .filter((m) => m.text || m.imageUrl); // faqat mavjud xabarlar
 
-            const lastMsgData = validMessages[0] || null;
-
-            let lastMessage: LastMessage | null = null;
-            let unreadCount = 0;
-
-            if (lastMsgData) {
-              lastMessage = {
-                text: lastMsgData.text || "",
-                createdAt: lastMsgData.createdAt,
-                imageUrl: lastMsgData.imageUrl,
-                seenBy: lastMsgData.seenBy || [],
-                senderId: lastMsgData.senderId || "",
-              };
-
-              unreadCount =
-                lastMessage.senderId === user.uid &&
-                !lastMessage.seenBy.includes(currentUser.uid)
-                  ? 1
-                  : 0;
+            if (validMessages.length === 0) {
+              // Hech qanday haqiqiy xabar yo'q, userListga qo‘shmaymiz
+              setUserList((prev) => prev.filter((u) => u.uid !== user.uid));
+              return;
             }
+
+            const lastMsgData = validMessages[0];
+
+            const lastMessage: LastMessage = {
+              text: lastMsgData.text || "",
+              createdAt: lastMsgData.createdAt,
+              imageUrl: lastMsgData.imageUrl,
+              seenBy: lastMsgData.seenBy || [],
+              senderId: lastMsgData.senderId || "",
+            };
+
+            const isUnread =
+              lastMessage.senderId === user.uid &&
+              !lastMessage.seenBy.includes(currentUser.uid);
 
             const userObj: UserWithLastMessage = {
               uid: user.uid,
@@ -93,7 +92,7 @@ export const useUsersWithLastMessage = () => {
               fullName: user.fullName,
               username: user.username,
               lastMessage,
-              unreadCount,
+              unreadCount: isUnread ? 1 : 0,
             };
 
             setUserList((prev) => {

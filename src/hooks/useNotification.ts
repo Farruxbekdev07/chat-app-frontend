@@ -1,6 +1,5 @@
 // src/hooks/useNotification.ts
 import { useEffect } from "react";
-import { toast } from "react-toastify";
 import { db } from "src/firebase/config";
 import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
@@ -17,11 +16,6 @@ export const useNotification = (userId: string) => {
       const { message, read } = data;
 
       if (message && !read) {
-        toast.info(message, {
-          position: "top-right",
-          autoClose: 5000,
-        });
-
         try {
           await updateDoc(notifRef, { read: true });
         } catch (err) {
