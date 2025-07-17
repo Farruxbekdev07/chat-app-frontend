@@ -78,34 +78,53 @@ const UserListItem = ({
               </Typography>
             ) : (
               user.lastMessage?.text && (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <Typography
-                    noWrap
-                    variant="body2"
-                    color="textSecondary"
-                    sx={{ maxWidth: 160 }}
+                <Box>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="space-between"
                   >
-                    {user?.lastMessage?.imageUrl
-                      ? "Photo"
-                      : user.lastMessage.text.length > 30
-                      ? user.lastMessage.text.slice(0, 30) + "…"
-                      : user.lastMessage.text}
-                  </Typography>
+                    <Typography
+                      noWrap
+                      variant="body2"
+                      color="textSecondary"
+                      sx={{ maxWidth: 160 }}
+                    >
+                      {user?.lastMessage?.imageUrl
+                        ? "Photo"
+                        : user.lastMessage.text.length > 30
+                        ? user.lastMessage.text.slice(0, 30) + "…"
+                        : user.lastMessage.text}
+                    </Typography>
 
-                  {user.lastMessage?.senderId === currentUserId ? (
-                    user.lastMessage?.seenBy?.length > 1 ? (
-                      <DoneAllIcon
-                        fontSize="small"
-                        sx={{ color: "#2196f3", ml: 1 }}
+                    {user.lastMessage?.senderId === currentUserId ? (
+                      user.lastMessage?.seenBy?.length > 1 ? (
+                        <DoneAllIcon
+                          fontSize="small"
+                          sx={{ color: "#2196f3", ml: 1 }}
+                        />
+                      ) : (
+                        <CheckIcon fontSize="small" sx={{ ml: 1 }} />
+                      )
+                    ) : null}
+                  </Box>
+
+                  {user.unreadCount > 0 && (
+                    <Box mt={0.5} display="flex" justifyContent="flex-end">
+                      <Badge
+                        badgeContent={user.unreadCount}
+                        color="primary"
+                        sx={{
+                          "& .MuiBadge-badge": {
+                            fontSize: "0.65rem",
+                            minWidth: 18,
+                            height: 18,
+                            padding: "0 6px",
+                          },
+                        }}
                       />
-                    ) : (
-                      <CheckIcon fontSize="small" sx={{ ml: 1 }} />
-                    )
-                  ) : null}
+                    </Box>
+                  )}
                 </Box>
               )
             )
