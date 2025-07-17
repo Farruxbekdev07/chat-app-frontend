@@ -62,7 +62,7 @@ export const useUsersWithLastMessage = () => {
           const q = query(messagesRef, orderBy("createdAt", "desc"), limit(10));
 
           const unsubscribeMsg = onSnapshot(q, (msgSnapshot) => {
-            let validMessages = msgSnapshot.docs
+            const validMessages = msgSnapshot.docs
               .map((d) => d.data())
               .filter((m) => m.text || m.imageUrl); // faqat o‘chirilmagan xabarlar
 

@@ -134,7 +134,7 @@ const AuthPage: React.FC = () => {
         container
         alignItems="center"
         justifyContent="center"
-        sx={{ height: "100vh" }}
+        className="grid-container"
       >
         <Grid item xs={10} sm={8} md={4}>
           <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>

@@ -66,10 +66,10 @@ const Sidebar = () => {
   };
 
   const handleLogout = () => {
-    router.push("/login");
     dispatch(setLoading(true));
-    setOpenDrawer(false);
+    router.push("/login");
     dispatch(logout());
+    setOpenDrawer(false);
     dispatch(clearSelectedUser());
   };
 

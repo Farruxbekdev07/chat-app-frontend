@@ -27,10 +27,10 @@ const MessagesContainer = styled.div`
 const ChatInputWrapper = styled(Paper)(({ theme }) => ({
   flex: 1,
   display: "flex",
-  alignItems: "center",
   border: "none",
-  // borderRadius: pxToRem(25),
-  // boxShadow: theme.shadows[2],
+  alignItems: "center",
+  borderRadius: pxToRem(25),
+  boxShadow: theme.shadows[2],
   backgroundColor: "transparent",
   padding: `${pxToRem(5)} ${pxToRem(10)}`,
 }));

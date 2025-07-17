@@ -35,7 +35,7 @@ const DashboardPage = () => {
     }
 
     dispatch(setLoading(false));
-  }, [currentUser, users.length]);
+  }, [currentUser, users.length, dispatch, router]);
 
   if (loading) return <Loader />;
 
