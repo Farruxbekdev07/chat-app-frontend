@@ -1,56 +1,38 @@
 import { Paper } from "@mui/material";
+
+import { pxToRem } from "src/utils";
 import styled from "styled-components";
 
-const ChatWrapper = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid red;
-`;
-
 const ChatContainer = styled.div`
-  height: calc(100vh - 64px);
   display: flex;
+  width: inherit;
   flex-direction: column;
 `;
 
 const MessagesContainer = styled.div`
   flex: 1;
-  padding: 15px;
   overflow-y: auto;
+  padding: ${pxToRem(15)};
 
   .no-messages {
     color: white;
     height: 100%;
     display: flex;
-    font-size: 18px;
     align-items: center;
     justify-content: center;
+    font-size: ${pxToRem(18)};
   }
-`;
-
-const InputContainer = styled.div`
-  gap: 10px;
-  display: flex;
-  padding: 10px;
-  align-items: end;
-  border-top: 1px solid ${({ theme }) => theme.palette.divider};
 `;
 
 const ChatInputWrapper = styled(Paper)(({ theme }) => ({
   flex: 1,
   display: "flex",
-  padding: "5px 10px",
+  border: "none",
   alignItems: "center",
-  borderRadius: "25px",
+  borderRadius: pxToRem(25),
   boxShadow: theme.shadows[2],
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: "transparent",
+  padding: `${pxToRem(5)} ${pxToRem(10)}`,
 }));
 
-export {
-  ChatWrapper,
-  ChatContainer,
-  InputContainer,
-  ChatInputWrapper,
-  MessagesContainer,
-};
+export { ChatContainer, ChatInputWrapper, MessagesContainer };

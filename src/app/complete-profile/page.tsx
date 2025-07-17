@@ -12,12 +12,7 @@ import {
   FormControl,
 } from "@mui/material";
 
-// next packages
-import { useRouter } from "next/navigation";
-
 const CompleteProfile = () => {
-  const router = useRouter();
-
   const {
     control,
     handleSubmit,
@@ -27,7 +22,6 @@ const CompleteProfile = () => {
   });
 
   const onSubmit = (data: { fullName: string; username: string }) => {
-    // router.push("/");
     console.log("data ========", data);
   };
 

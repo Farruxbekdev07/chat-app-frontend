@@ -1,8 +1,9 @@
 "use client";
 
 import { createTheme } from "@mui/material/styles";
+import { pxToRem } from "./utils";
 
-const theme = createTheme({
+const baseTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
@@ -43,7 +44,7 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: "8px",
+          borderRadius: pxToRem(8),
           textTransform: "none",
         },
       },
@@ -52,7 +53,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: "#ffffff",
-          borderRadius: "8px",
+          borderRadius: pxToRem(8),
           backgroundColor: "#2b2b2b",
         },
       },
@@ -71,7 +72,24 @@ const theme = createTheme({
         },
       },
     },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          display: "flex",
+          width: pxToRem(300),
+          flexDirection: "column",
+          justifyContent: "space-between",
+        },
+      },
+    },
   },
 });
+
+const theme = {
+  ...baseTheme,
+  customColors: {
+    primaryLight: "#bbdefb", // bu sizga kerakli custom color
+  },
+};
 
 export default theme;
