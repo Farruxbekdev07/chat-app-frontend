@@ -42,69 +42,86 @@ interface User {
 
 export const useUsersWithLastMessage = () => {
   const [userList, setUserList] = useState<UserWithLastMessage[]>([]);
+  const [loading, setLoading] = useState(true);
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
   useEffect(() => {
     if (!currentUser?.uid) return;
 
+    setLoading(true);
+
     const unsubscribeUsers = onSnapshot(
       collection(db, "users"),
       (userSnapshot) => {
         const unsubscribers: (() => void)[] = [];
+        let activeListeners = 0;
 
-        userSnapshot.forEach((userDoc) => {
+        // 🔹 Agar boshqa user yo‘q bo‘lsa ham loader o‘chirilsin
+        const otherUsers = userSnapshot.docs.filter(
+          (doc) => doc.data().uid !== currentUser.uid
+        );
+        if (otherUsers.length === 0) {
+          setUserList([]);
+          setLoading(false);
+          return;
+        }
+
+        otherUsers.forEach((userDoc) => {
           const user = userDoc.data();
-          if (user.uid === currentUser.uid) return;
+
+          activeListeners++;
 
           const chatId = [currentUser.uid, user.uid].sort().join("_");
           const messagesRef = collection(db, "chats", chatId, "messages");
-
           const q = query(messagesRef, orderBy("createdAt", "desc"), limit(10));
 
           const unsubscribeMsg = onSnapshot(q, (msgSnapshot) => {
             const validMessages = msgSnapshot.docs
               .map((d) => d.data())
-              .filter((m) => m.text || m.imageUrl); // faqat mavjud xabarlar
+              .filter((m) => m.text || m.imageUrl);
 
             if (validMessages.length === 0) {
-              // Hech qanday haqiqiy xabar yo'q, userListga qo‘shmaymiz
               setUserList((prev) => prev.filter((u) => u.uid !== user.uid));
-              return;
+            } else {
+              const lastMsgData = validMessages[0];
+              const lastMessage: LastMessage = {
+                text: lastMsgData.text || "",
+                createdAt: lastMsgData.createdAt,
+                imageUrl: lastMsgData.imageUrl,
+                seenBy: lastMsgData.seenBy || [],
+                senderId: lastMsgData.senderId || "",
+              };
+
+              const isUnread =
+                lastMessage.senderId === user.uid &&
+                !lastMessage.seenBy.includes(currentUser.uid);
+
+              const userObj: UserWithLastMessage = {
+                uid: user.uid,
+                image: user.image || "",
+                fullName: user.fullName,
+                username: user.username,
+                lastMessage,
+                unreadCount: isUnread ? 1 : 0,
+              };
+
+              setUserList((prev) => {
+                const updated = prev.filter((u) => u.uid !== user.uid);
+                const newList = [...updated, userObj];
+                newList.sort((a, b) => {
+                  const aTime = a.lastMessage?.createdAt?.toMillis?.() || 0;
+                  const bTime = b.lastMessage?.createdAt?.toMillis?.() || 0;
+                  return bTime - aTime;
+                });
+                return newList;
+              });
             }
 
-            const lastMsgData = validMessages[0];
-
-            const lastMessage: LastMessage = {
-              text: lastMsgData.text || "",
-              createdAt: lastMsgData.createdAt,
-              imageUrl: lastMsgData.imageUrl,
-              seenBy: lastMsgData.seenBy || [],
-              senderId: lastMsgData.senderId || "",
-            };
-
-            const isUnread =
-              lastMessage.senderId === user.uid &&
-              !lastMessage.seenBy.includes(currentUser.uid);
-
-            const userObj: UserWithLastMessage = {
-              uid: user.uid,
-              image: user.image || "",
-              fullName: user.fullName,
-              username: user.username,
-              lastMessage,
-              unreadCount: isUnread ? 1 : 0,
-            };
-
-            setUserList((prev) => {
-              const updated = prev.filter((u) => u.uid !== user.uid);
-              const newList = [...updated, userObj];
-              newList.sort((a, b) => {
-                const aTime = a.lastMessage?.createdAt?.toMillis?.() || 0;
-                const bTime = b.lastMessage?.createdAt?.toMillis?.() || 0;
-                return bTime - aTime;
-              });
-              return newList;
-            });
+            // Listener tugaganda activeListeners kamayadi
+            activeListeners--;
+            if (activeListeners <= 0) {
+              setLoading(false);
+            }
           });
 
           unsubscribers.push(unsubscribeMsg);
@@ -119,7 +136,7 @@ export const useUsersWithLastMessage = () => {
     return () => unsubscribeUsers();
   }, [currentUser?.uid]);
 
-  return userList;
+  return { users: userList, loading };
 };
 
 export const useAllUsers = () => {
