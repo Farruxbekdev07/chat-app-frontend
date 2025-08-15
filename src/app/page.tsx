@@ -15,10 +15,9 @@ import { useOnlineStatusWriter } from "src/hooks/useUserStatus";
 const DashboardPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const loading = useSelector((state: RootState) => state.auth.loading);
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
-  const users = useUsersWithLastMessage();
+  const { loading: usersLoading } = useUsersWithLastMessage();
 
   useNotification(currentUser?.uid || "");
   useOnlineStatusWriter();
@@ -29,15 +28,15 @@ const DashboardPage = () => {
       return;
     }
 
-    if (users.length === 0) {
+    if (usersLoading) {
       dispatch(setLoading(true));
       return;
     }
 
     dispatch(setLoading(false));
-  }, [currentUser, users.length, dispatch, router]);
+  }, [currentUser, usersLoading, dispatch, router]);
 
-  if (loading) return <Loader />;
+  if (usersLoading) return <Loader />;
 
   return <DashboardLayout />;
 };
