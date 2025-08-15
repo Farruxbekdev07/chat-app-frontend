@@ -37,7 +37,7 @@ const Sidebar = () => {
     (state: RootState) => state.message.selectedUser
   );
 
-  const recentUsers = useUsersWithLastMessage();
+  const { users: recentUsers } = useUsersWithLastMessage();
   const allUsers = useAllUsers();
 
   const handleNavigate = (user: {
